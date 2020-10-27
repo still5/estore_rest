@@ -1,0 +1,32 @@
+{
+  "name": "estore_rest",
+  "version": "1.0.0",
+  "description": "estore backend project",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/still5/estore_rest.git"
+  },
+  "author": "Andrii Tatarinov <and.tatarinov@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/still5/estore_rest/issues"
+  },
+  "homepage": "https://github.com/still5/estore_rest#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mysql2": "^2.2.5"
+  },
+  "devDependencies": {
+    "eslint": "^7.2.0",
+    "eslint-config-airbnb": "^18.2.0",
+    "eslint-plugin-import": "^2.21.2",
+    "eslint-plugin-jsx-a11y": "^6.3.0",
+    "eslint-plugin-react": "^7.20.0",
+    "eslint-plugin-react-hooks": "^4.0.0"
+  }
+}
