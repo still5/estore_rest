@@ -1,13 +1,20 @@
 const express = require('express');
 const router = express.Router();
 
-router.get('/add-supplier', (req, res, next) => {
-    res.send('<form action="/product" method="POST"><input type="text" name="title"><button type="submit">Add Supplier</button></form>');
-});
+const suppliersController = require('../../controllers/suppliers');
 
-router.post('/suppliers', (req, res, next) => {
-    console.log(req.body.title);
-    res.redirect('/');
-});
+//GET (Read)
+router.get('/', suppliersController.getSuppliers);
+
+router.get('/:supplierId', suppliersController.getSupplier);
+
+//POST (Create)
+router.post('/', suppliersController.postSupplier);
+
+//PUT (Update)
+router.put('/:supplierId', suppliersController.putSupplier);
+
+//DELETE (Delete)
+router.delete('/:supplierId', suppliersController.deleteSupplier);
 
 module.exports = router;

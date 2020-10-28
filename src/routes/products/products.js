@@ -1,15 +1,22 @@
 const express = require('express');
+
 const router = express.Router();
 
 const productsController = require('../../controllers/products');
 
-router.get('/products', productsController.getProducts);
+//GET (Read)
+router.get('/', productsController.getProducts);
 
-router.get('/add-product', (req, res, next) => {
-    res.send('<form action="/products" method="POST"><input type="text" name="title"><button type="submit">Add P</button></form>');
-});
+router.get('/:productId', productsController.getProduct);
 
-router.post('/products', productsController.postProduct);
-router.get('/products/:productId', productsController.getProducts);
+//POST (Create)
+router.post('/', productsController.postProduct);
+
+//PUT (Update)
+router.put('/:productId', productsController.putProduct);
+
+//DELETE (Delete)
+router.delete('/:productId', productsController.deleteProduct);
+
 
 module.exports = router;
