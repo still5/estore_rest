@@ -9,10 +9,6 @@ const categorySchema = new Schema({
     },
     description: {
         type: String,
-        required: false
-    },
-    quantity: {
-        type: Number,
         required: true
     }
 });

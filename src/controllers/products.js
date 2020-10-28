@@ -1,4 +1,6 @@
 const Product = require('../models/product');
+const Supplier = require('../models/supplier');
+const Category = require('../models/category');
 
 //GET (Read)
 //all products
@@ -27,7 +29,7 @@ exports.getProduct = (req, res, next) => {
         error.statusCode = 404;
         throw error;
       }
-      res.status(200).json({ message: 'Post fetched.', product: product });
+      res.status(200).json({ message: 'Product found.', product: product });
     })
     .catch(err => {
       if (!err.statusCode) {
@@ -39,25 +41,28 @@ exports.getProduct = (req, res, next) => {
 
 //POST (Create)
 exports.postProduct = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const error = new Error('Validation failed, entered data is incorrect.');
-    error.statusCode = 422;
-    throw error;
-  }
-  if (!req.file) {
-    const error = new Error('No image provided.');
-    error.statusCode = 422;
-    throw error;
-  }
-  const image = req.file.path;
   const title = req.body.title;
   const description = req.body.description;
+  const price = req.body.price;
+  const category_ref = req.body.category_ref;
+  const image = req.body.image;
+  const status = req.body.status;
+  const supplier_ref = req.body.supplier_ref;
+  const expiryDate = req.body.expiryDate;
+  const measurement = req.body.measurement;
+  const quantity = req.body.quantity;
+
   const product = new Product({
     title: title,
     description: description,
+    price: price,
+    category_ref: category_ref,
     image: image,
-    creator: { name: 'User' }
+    status: status,
+    supplier_ref: supplier_ref,
+    expiryDate: expiryDate,
+    measurement: measurement,
+    quantity: quantity
   });
   product
     .save()
@@ -78,23 +83,16 @@ exports.postProduct = (req, res, next) => {
 //PUT (Update)
 exports.putProduct = (req, res, next) => {
   const productId = req.params.productId;
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const error = new Error('Validation failed, entered data is incorrect.');
-    error.statusCode = 422;
-    throw error;
-  }
   const title = req.body.title;
-  const content = req.body.content;
-  let image = req.body.image;
-  if (req.file) {
-    image = req.file.path;
-  }
-  if (!image) {
-    const error = new Error('No file picked.');
-    error.statusCode = 422;
-    throw error;
-  }
+  const description = req.body.description;
+  const price = req.body.price;
+  const category_ref = req.body.category_ref;
+  const image = req.body.image;
+  const status = req.body.status;
+  const supplier_ref = req.body.supplier_ref;
+  const expiryDate = req.body.expiryDate;
+  const measurement = req.body.measurement;
+  const quantity = req.body.quantity;
   Product.findById(productId)
     .then(product => {
       if (!product) {
@@ -102,16 +100,20 @@ exports.putProduct = (req, res, next) => {
         error.statusCode = 404;
         throw error;
       }
-      if (image !== product.image) {
-        clearImage(product.image);
-      }
       product.title = title;
-      product.image = image;
       product.description = description;
+      product.price = price;
+      product.category_ref = category_ref;
+      product.image = image;
+      product.status = status;
+      product.supplier_ref = supplier_ref;
+      product.expiryDate = expiryDate;
+      product.measurement = measurement;
+      product.quantity = quantity;
       return product.save();
     })
     .then(result => {
-      res.status(200).json({ message: 'Product updated!', product: result });
+      res.status(200).json({ message: 'Product updated', product: result });
     })
     .catch(err => {
       if (!err.statusCode) {
@@ -123,6 +125,7 @@ exports.putProduct = (req, res, next) => {
 
 //DELETE (Delete)
 exports.deleteProduct = (req, res, next) => {
+  
 };
 
 
