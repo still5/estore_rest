@@ -17,8 +17,11 @@
   },
   "homepage": "https://github.com/still5/estore_rest#readme",
   "dependencies": {
+    "body-parser": "^1.19.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "mongodb": "^3.6.2",
+    "mongoose": "^5.10.11",
     "mysql2": "^2.2.5"
   },
   "devDependencies": {

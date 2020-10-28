@@ -1,24 +1,49 @@
-const http = require('http');
+//const http = require('http');
+const express = require('express');
+const app = express();
+const indexRoutes = require('./routes/index');
 const env = require('dotenv').config({path: './config/.env'});
+const mongoose = require('mongoose');
+const portToListen = process.env.NODE_PORT;
 
-//const app = express();
+
 //app.set('view engine', 'ejs');
 //app.set('views', 'views');
 
-const routes = require('./routes/index');
+//To test CORS
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    next();
+});
 
-const server = http.createServer(routes.handler);
+app.use(indexRoutes);
 
-const portToListen = process.env.NODE_PORT;
-server.listen(portToListen);
+/*
+mongoose
+.connect(process.env.DB_CONNECTION_STRING, {useNewUrlParser: true, useUnifiedTopology: true})
+    .then(result => {
+        console.log('DB connected');
+        app.listen(portToListen);
+    })
+    .catch(err => {
+        console.log(err);
+    });
+*/
 
-const db = require('./db/database');
+const mongooseConnect = require('./db/database');
 
-db.execute('SELECT * FROM statuses')
+mongooseConnect(client => {
+    //console.log(client);
+    app.listen(portToListen);
+})
+
+/*db.execute('SELECT * FROM statuses')
     .then( result => {
         console.log(result[0], result[1], result[2]);
     })
     .catch( err => {
         console.log(err);
     });
-
+*/
