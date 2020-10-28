@@ -1,6 +1,6 @@
-const mongooseSchema = require('../db/database');
-const Schema = mongoose.Schema;
+//const mongooseSchema = require('../db/database');
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 const productSchema = new Schema({
     title: {
@@ -17,6 +17,10 @@ const productSchema = new Schema({
     },
     category_ref: {
         type: Number,
+        required: true
+    },
+    image: {
+        type: String,
         required: true
     },
     status: {
