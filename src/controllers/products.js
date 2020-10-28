@@ -1,161 +1,130 @@
 const Product = require('../models/product');
 
-/*
+//GET (Read)
+//all products
 exports.getProducts = (req, res, next) => {
-    console.log(req.body.title);
-    res.status(200).json({posts: [{title: 'Post title', content: 'This is the content of the post.'}]});
-};
-*/
-exports.getSingleProduct = (req, res, next) => {
-    console.log(req.body.title);
-    res.status(200).json({posts: [{title: 'Post title', content: 'This is the content of the post.'}]});
-};
-
-exports.getProducts = (req, res, next) => {
-  Product.fetchAll()
-    .then(products => {
-        res.status(200).json({posts: [{title: 'Post title', content: 'This is the content of the post.'}]})
-      res.send('products', {
-        prods: products,
-        pageTitle: 'All Products',
-        path: '/products'
-      });
-    })
-    .catch(err => {
-      console.log(err);
-    });
+  Product.find()
+  .then(products => {
+    res
+      .status(200)
+      .json({ message: 'Fetched products successfully.', products: products });
+  })
+  .catch(err => {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  });
 };
 
-exports.postProduct = (req, res, next) => {
-    const title = req.body.title;
-    const content = req.body.content;
-    res.status(201).json({
-        message: 'Product created successfully',
-        post: {id: new Date().toISOString(), title: title, content: content}
-    });
-};
-
-
-/* /////////////// */
-/*
-*/
-exports.getProducts = (req, res, next) => {
-    const currentPage = req.query.page || 1;
-    const perPage = 2;
-    let totalItems;
-    Post.find()
-      .countDocuments()
-      .then(count => {
-        totalItems = count;
-        return Post.find()
-          .skip((currentPage - 1) * perPage)
-          .limit(perPage);
-      })
-      .then(products => {
-        res.status(200).json({
-          message: 'Fetched products successfully.',
-          posts: products,
-          totalItems: totalItems
-        });
-      })
-      .catch(err => {
-        if (!err.statusCode) {
-          err.statusCode = 500;
-        }
-        next(err);
-      });
-  };
-
+//single product
 exports.getProduct = (req, res, next) => {
-  const prodId = req.params.productId;
-  // Product.findAll({ where: { id: prodId } })
-  //   .then(products => {
-  //     res.render('shop/product-detail', {
-  //       product: products[0],
-  //       pageTitle: products[0].title,
-  //       path: '/products'
-  //     });
-  //   })
-  //   .catch(err => console.log(err));
-  Product.findById(prodId)
+  const productId = req.params.productId;
+  Product.findById(productId)
     .then(product => {
-      res.render('shop/product-detail', {
-        product: product,
-        pageTitle: product.title,
-        path: '/products'
-      });
+      if (!product) {
+        const error = new Error('Could not find product.');
+        error.statusCode = 404;
+        throw error;
+      }
+      res.status(200).json({ message: 'Post fetched.', product: product });
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
 };
 
-exports.getIndex = (req, res, next) => {
-  Product.fetchAll()
-    .then(products => {
-      res.render('shop/index', {
-        prods: products,
-        pageTitle: 'Shop',
-        path: '/'
+//POST (Create)
+exports.postProduct = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = new Error('Validation failed, entered data is incorrect.');
+    error.statusCode = 422;
+    throw error;
+  }
+  if (!req.file) {
+    const error = new Error('No image provided.');
+    error.statusCode = 422;
+    throw error;
+  }
+  const image = req.file.path;
+  const title = req.body.title;
+  const description = req.body.description;
+  const product = new Product({
+    title: title,
+    description: description,
+    image: image,
+    creator: { name: 'User' }
+  });
+  product
+    .save()
+    .then(result => {
+      res.status(201).json({
+        message: 'Product created successfully!',
+        product: result
       });
     })
     .catch(err => {
-      console.log(err);
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
     });
 };
 
-exports.getCart = (req, res, next) => {
-  req.user
-    .getCart()
-    .then(products => {
-      res.render('shop/cart', {
-        path: '/cart',
-        pageTitle: 'Your Cart',
-        products: products
-      });
-    })
-    .catch(err => console.log(err));
-};
-
-exports.postCart = (req, res, next) => {
-  const prodId = req.body.productId;
-  Product.findById(prodId)
+//PUT (Update)
+exports.putProduct = (req, res, next) => {
+  const productId = req.params.productId;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = new Error('Validation failed, entered data is incorrect.');
+    error.statusCode = 422;
+    throw error;
+  }
+  const title = req.body.title;
+  const content = req.body.content;
+  let image = req.body.image;
+  if (req.file) {
+    image = req.file.path;
+  }
+  if (!image) {
+    const error = new Error('No file picked.');
+    error.statusCode = 422;
+    throw error;
+  }
+  Product.findById(productId)
     .then(product => {
-      return req.user.addToCart(product);
+      if (!product) {
+        const error = new Error('Could not find product.');
+        error.statusCode = 404;
+        throw error;
+      }
+      if (image !== product.image) {
+        clearImage(product.image);
+      }
+      product.title = title;
+      product.image = image;
+      product.description = description;
+      return product.save();
     })
     .then(result => {
-      console.log(result);
-      res.redirect('/cart');
+      res.status(200).json({ message: 'Product updated!', product: result });
+    })
+    .catch(err => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
     });
 };
 
-exports.postCartDeleteProduct = (req, res, next) => {
-  const prodId = req.body.productId;
-  req.user
-    .deleteItemFromCart(prodId)
-    .then(result => {
-      res.redirect('/cart');
-    })
-    .catch(err => console.log(err));
+//DELETE (Delete)
+exports.deleteProduct = (req, res, next) => {
 };
 
-exports.postOrder = (req, res, next) => {
-  let fetchedCart;
-  req.user
-    .addOrder()
-    .then(result => {
-      res.redirect('/orders');
-    })
-    .catch(err => console.log(err));
-};
 
-exports.getOrders = (req, res, next) => {
-  req.user
-    .getOrders()
-    .then(orders => {
-      res.render('shop/orders', {
-        path: '/orders',
-        pageTitle: 'Your Orders',
-        orders: orders
-      });
-    })
-    .catch(err => console.log(err));
-};
+
+
