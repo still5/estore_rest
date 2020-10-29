@@ -3,8 +3,9 @@
 
 Database model: https://whimsical.com/TSYLHMhnyV2Pp13WWhjr4q
 
+Note: master branch has last commit at 28 oct, 18:00. Since then, 'develop' branch is used.
 
-API logic (routing)
+API logic (routing):
 The request expected to contain JSON. Method defines the type of CRUD operation.
 The response returns the content in its body in JSON format
 Port: 3000
