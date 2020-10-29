@@ -14,7 +14,13 @@ const supplierSchema = new Schema({
     address: {
         type: String,
         required: true
-    }
+    },
+    products: [
+        {
+        type: Schema.Types.ObjectId,
+        ref: 'Product'
+        }
+    ]
 });
 
 module.exports = mongoose.model('Supplier', supplierSchema);

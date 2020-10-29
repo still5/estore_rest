@@ -67,9 +67,31 @@ exports.postProduct = (req, res, next) => {
   product
     .save()
     .then(result => {
+        //Updating particular Supplier to put a Product array link
+      supplier = Supplier.findById(supplier_ref)
+      .then(supplier => {
+      if (!supplier) {
+        const error = new Error('Could not find THE SUPPLIER.');
+        error.statusCode = 404;
+        throw error;
+      }
+      supplier.products.push(product);
+      supplier.save();
+    });
+        //Updating particular Category to put a Product array link
+      category = Category.findById(category_ref)
+      .then(category => {
+        if (!category) {
+          const error = new Error('Could not find THE CATEGORY.');
+          error.statusCode = 404;
+          throw error;
+        }
+      category.products.push(product);
+      category.save();
+      });
       res.status(201).json({
         message: 'Product created successfully!',
-        product: result
+        product: product
       });
     })
     .catch(err => {
@@ -81,6 +103,7 @@ exports.postProduct = (req, res, next) => {
 };
 
 //PUT (Update)
+/* TO DO: if category/supplier is different, then must delete a link to that cat/sup (like in deletePost) and create a link with the new cat/sup (like in createPost) */
 exports.putProduct = (req, res, next) => {
   const productId = req.params.productId;
   const title = req.body.title;

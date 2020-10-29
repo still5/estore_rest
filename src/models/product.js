@@ -16,7 +16,8 @@ const productSchema = new Schema({
         required: true
     },
     category_ref: {
-        type: Number,
+        type: Schema.Types.ObjectId,
+        ref: 'Category',
         required: true
     },
     image: {
@@ -28,7 +29,8 @@ const productSchema = new Schema({
         required: true
     },
     supplier_ref: {
-        type: Number,
+        type: Schema.Types.ObjectId,
+        ref: 'Supplier',
         required: true
     },
     expiryDate: {
