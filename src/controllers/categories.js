@@ -89,6 +89,25 @@ exports.putCategory = (req, res, next) => {
       });    
 };
 
-//delete
+//delete category
 exports.deleteCategory = (req, res, next) => {
+    const categoryId = req.params.categoryId;
+    Category.findById(categoryId)
+    .then(category => {
+      if (!category) {
+        const error = new Error('Could not find category.');
+        error.statusCode = 404;
+        throw error;
+      }
+      return Category.findByIdAndRemove(categoryId);
+    })
+    .then(result => {
+        res.status(200).json({ message: 'Category deleted successfully'});
+    })
+    .catch(err => {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    });
 };

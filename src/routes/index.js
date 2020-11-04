@@ -29,9 +29,10 @@ router.use((req, res, next) => {
     res.locals.error = req.app.get('env') === 'development' ? err : {};
   
     // render the error page
-    res.status(err.status || 500);
-    console.log(err);
-    res.send('<p>Page not found...</p><br><a href="/">Click to return to valid page</a>');
+    //res.status(err.status || 500);
+    //console.log(err);
+    res.status = 500; //).json({message: 'Page not found!'});
+    //res.send('<p>Page not found...</p><br><a href="/">Click to return to valid page</a>');
   });
 
 module.exports = router;
